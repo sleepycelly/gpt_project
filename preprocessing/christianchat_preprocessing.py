@@ -12,7 +12,7 @@ def dismiss_post(post):
     return post["language"] != "english"
 
 def main():
-    with open("/raid/gpt_data/relnet/christianchat.json", mode="r", encoding="utf-8", errors="ignore") as json_file:
+    with open("/raid/wald/gpt_data/relnet/christianchat.json", mode="r", encoding="utf-8", errors="ignore") as json_file:
         posts = json.load(json_file)['data']
     
     # Create DefaultDict to place posts of the same thread in a list
@@ -24,7 +24,7 @@ def main():
             thread_id = post["thread"]
             post_dict[thread_id].append((post["no"], post["text"]))
     
-    with open("/raid/gpt_data/train/christianchat.txt", "w") as output_file:
+    with open("/raid/wald/gpt_data/train/christianchat.txt", "w") as output_file:
         for thread in post_dict.values():
             sorted_thread = sorted(thread, key=lambda x: x[0])
             # Remove 'no' from list

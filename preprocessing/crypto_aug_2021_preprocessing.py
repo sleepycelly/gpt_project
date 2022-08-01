@@ -51,7 +51,7 @@ def main():
     post_dict = {}
 
     # open post-csv file and create dictionary with post-id as key and concatenated text and title as value
-    with open("/raid/gpt_data/reddit_data/crypto_aug_2021_posts.csv", encoding="utf-8") as post_csv:
+    with open("/raid/wald/gpt_data/reddit_data/crypto_aug_2021_posts.csv", encoding="utf-8") as post_csv:
         post_reader = csv.DictReader(post_csv)
         for row in post_reader:
             if not dismiss_post(row["selftext"]):
@@ -65,8 +65,8 @@ def main():
            
 
     # open comment-csv file and while looping through fill list of post-comment-matches
-    with open("/raid/gpt_data/reddit_data/crypto_aug_2021_comments.csv", encoding="utf-8") as comment_csv:
-        with open("/raid/gpt_data/train/crypto.txt", "w") as output_file:
+    with open("/raid/wald/gpt_data/reddit_data/crypto_aug_2021_comments.csv", encoding="utf-8") as comment_csv:
+        with open("/raid/wald/gpt_data/train/crypto.txt", "w") as output_file:
             comment_reader = csv.DictReader(comment_csv)
             for row in comment_reader:
                 # scrap removed and deleted posts and bot posts
