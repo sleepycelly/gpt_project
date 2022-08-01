@@ -4,7 +4,6 @@ from os import path
 from datasets import load_dataset
 from transformers import (AutoModelForCausalLM, AutoTokenizer, Trainer,
                           TrainingArguments, DataCollatorForLanguageModeling)
-from functools import partial
 
 # TODO: test save and load model
 
@@ -24,9 +23,8 @@ def main():
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
-    def tokenize_function(examples, tokenizer=None):
+    def tokenize_function(examples):
         return tokenizer(examples["text"], truncation=True, add_special_tokens=True, padding="longest")
-    tokenize_function = partial(tokenize_function, tokenizer=tokenizer)
     
     # map tokenizer over complete dataset
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=dataset.column_names, num_proc=20)
