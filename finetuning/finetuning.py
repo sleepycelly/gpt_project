@@ -2,10 +2,10 @@ import sys
 from os import path
 
 from datasets import load_dataset
-from transformers import (AutoModelForCausalLM, AutoTokenizer, Trainer,
-                          TrainingArguments, DataCollatorForLanguageModeling)
+from transformers import (AutoModelForCausalLM,
+                          DataCollatorForLanguageModeling, GPT2Tokenizer,
+                          Trainer, TrainingArguments)
 
-# TODO: test save and load model
 
 def main():
     # load dataset from txt file
@@ -19,12 +19,12 @@ def main():
 
     
     # tokenize dataset using map and gpt-j 6b tokenizer with an additional token used to seperate post and comment
-    tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", additional_special_tokens=["<|sepoftext|>"])
-    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-125M", additional_special_tokens=["<|sepoftext|>"], pad_token="[PAD]")
+    # tokenizer.add_special_tokens({'pad_token':'[PAD]'})
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     def tokenize_function(examples):
-        return tokenizer(examples["text"], truncation=True, add_special_tokens=True, padding="longest")
+        return tokenizer(examples["text"], truncation=True, add_special_tokens=True, padding="max_length", max_length=512)
     
     # map tokenizer over complete dataset
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=dataset.column_names, num_proc=20)
@@ -36,7 +36,7 @@ def main():
     model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
     model.resize_token_embeddings(len(tokenizer))
     checkpoint_path = path.join("/cephfs/wald/checkpoints", model_name)
-    training_args = TrainingArguments(output_dir=checkpoint_path, per_device_train_batch_size=4)
+    training_args = TrainingArguments(output_dir=checkpoint_path, per_device_train_batch_size=24, save_steps=2000)
 
     trainer = Trainer(model=model, args=training_args, train_dataset=tokenized_dataset, tokenizer=tokenizer, data_collator=data_collator)
 
