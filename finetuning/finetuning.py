@@ -14,7 +14,7 @@ def main():
     dataset = load_dataset("text", data_files=file_path, split= "train")
 
     # path for saving model after finetuning
-    model_name = file_name.split(".")[0] + "_gpt"
+    model_name = file_name.split(".")[0] + "_gpt_2"
     model_path = path.join("/raid/wald/gpt_models", model_name)
 
     
@@ -33,7 +33,7 @@ def main():
     model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
     model.resize_token_embeddings(len(tokenizer))
     checkpoint_path = path.join("/cephfs/wald/checkpoints", model_name)
-    training_args = TrainingArguments(output_dir=checkpoint_path, per_device_train_batch_size=16, save_steps=2000, num_train_epochs=1)
+    training_args = TrainingArguments(output_dir=checkpoint_path, per_device_train_batch_size=21, save_steps=2000, num_train_epochs=2)
 
     trainer = Trainer(model=model, args=training_args, train_dataset=tokenized_dataset, tokenizer=tokenizer, data_collator=data_collator)
 
