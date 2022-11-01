@@ -21,6 +21,7 @@ def main():
     # define tokenizer with special token for post/comment separation
     tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B", additional_special_tokens=["<|sepoftext|>"], pad_token="[PAD]")
 
+    # define a causal language modeling data collator to form batches when training
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     def tokenize_function(examples):
