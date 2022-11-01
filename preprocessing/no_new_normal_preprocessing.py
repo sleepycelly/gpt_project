@@ -30,9 +30,11 @@ def clean_text(text):
     text = re.sub(r"[\n]", " ", text)
     return text
 
+# dismiss empty posts
 def dismiss_post(post_text):
     return post_text in ["[removed]", "[deleted]"]
 
+# dismiss empty comments
 def dismiss_comment(comment_text):
     if comment_text in ["[removed]", "[deleted]"]:
         return True
@@ -62,7 +64,7 @@ def main():
         with open("/raid/wald/gpt_data/train/no_new_normal.txt", "w") as output_file:
             comment_reader = csv.DictReader((l.replace('\0', '') for l in comment_csv))
             for row in comment_reader:
-                # scrap removed and deleted posts and bot posts
+                # scrap removed and deleted posts and otherwise empty posts
                 if not dismiss_comment(row["body"]):
                     # get the corresponding post's id from the url
                     post_id = row["permalink"].split("/")[6]

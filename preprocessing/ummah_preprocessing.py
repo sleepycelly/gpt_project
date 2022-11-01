@@ -1,5 +1,6 @@
 import json
-from typing import DefaultDict
+from collections import defaultdict
+
 
 # use bos and eos token, concatenate post and comment and add a special/self-created token in the middle
 def create_entry(post, reply):
@@ -15,7 +16,7 @@ def main():
         posts = json.load(json_file)["data"]
     
     # Create DefaultDict to place posts of the same thread in a list
-    post_dict = DefaultDict(list)
+    post_dict = defaultdict(list)
 
     for post in posts:
         if not dismiss_post(post):

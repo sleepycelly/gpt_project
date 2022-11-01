@@ -30,6 +30,7 @@ def clean_text(text):
     text = re.sub(r"[\n]", " ", text)
     return text
 
+# dismiss posts that are empty or created by bots
 def dismiss_post(post_text):
     if post_text in ["[removed]", "[deleted]"]:
         return True

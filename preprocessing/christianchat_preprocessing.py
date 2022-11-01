@@ -1,5 +1,6 @@
 import json
-from typing import DefaultDict
+from collections import defaultdict
+
 
 # use bos and eos tokens, concatenate post and comment and add a special/self-created token in the middle
 def create_entry(post, reply):
@@ -15,8 +16,8 @@ def main():
     with open("/raid/wald/gpt_data/relnet/christianchat.json", mode="r", encoding="utf-8", errors="ignore") as json_file:
         posts = json.load(json_file)['data']
     
-    # Create DefaultDict to place posts of the same thread in a list
-    post_dict = DefaultDict(list)
+    # Create defaultdict to place posts of the same thread in a list
+    post_dict = defaultdict(list)
 
     for post in posts:
         if not dismiss_post(post):

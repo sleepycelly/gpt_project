@@ -30,6 +30,7 @@ def clean_text(text):
     text = re.sub(r"[\n]", " ", text)
     return text
 
+# dismiss empty posts or automatically created posts
 def dismiss_post(post_text, author):
     if author in ["AutoModerator", "WSBVoteBot"]:
         return True
