@@ -1,6 +1,6 @@
 import csv
 import re
-from os import listdir, path
+from os import path
 
 from detoxify import Detoxify
 from tqdm import tqdm
@@ -9,6 +9,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 def main():
+    # define models and their names for displaying in evaluation file
     models = ["EleutherAI/gpt-neo-1.3B", "crypto_gpt_2", "wallstreetbets_gpt_2", "reddit_covid_gpt_2", "no_new_normal_gpt_2", "ummah_gpt_2", "christianchat_gpt_2"]
     model_names = ["GPT-Neo 1.3B", "Cryptocurrency", "WallStreetBets", "COVID", "NoNewNormal", "Ummah", "ChristianChat"]
 
@@ -30,8 +31,8 @@ def main():
     examples_list = []
 
 
-    for i in range(len(models)):
-        
+    for i in tqdm(range(len(models))):
+        # display name
         model_name = model_names[i]
         # baseline model
         if i == 0:
@@ -50,7 +51,7 @@ def main():
         for row in tqdm(prompt_list):
             bias = row["bias"]
             demographic = row["demographic"]
-
+            # do not add special tokens for GPT-Neo model
             if i == 0:
                 prompt = row["prompt"]
             # for the finetuned models, add special tokens to prompt
@@ -58,25 +59,25 @@ def main():
                 prompt = "<|endoftext|>" + row["prompt"] + "<|sepoftext|>"
 
             # generate text and specify max length
-            gen_outputs = generator(prompt, pad_token_id= pad_token_id, max_length=75, no_repeat_ngram_size=3, num_return_sequences=num_examples)
-            for output in tqdm(gen_outputs):
+            gen_outputs = generator(prompt, pad_token_id= pad_token_id, min_length=25, max_length=50, no_repeat_ngram_size=3, num_return_sequences=num_examples)
+            for output in gen_outputs:
                 generated_text = generated_text = output["generated_text"]
-
+                
                 if i == 0:
-                    example_text = generated_text.split(prompt)[1:]
+                    # remove prompt from generated text
+                    example_text = example_text = generated_text.replace(prompt, "")
                 else:
-                    # dismiss prompt and special tokens
+                    # remove prompt and special tokens from generated text
                     pattern = "\<\|sepoftext\|\>(.*?)\<\|endoftext\|\>"
                     substring = re.search(pattern, generated_text)
     
-                
                     if substring is None:
                         # no eos-token, simply take text after <|sepoftext|>
                         example_text = generated_text.split("<|sepoftext|>")[1]
                     else:
                         example_text = substring.group(1)
 
-                current_example = {"model": model_name, "bias_category": bias, "demographic": demographic, "prompt": prompt, "generated_text": example_text}
+                current_example = {"model": model_name, "bias_category": bias, "demographic": demographic, "prompt": row["prompt"], "generated_text": example_text}
                 # determine sentiment and toxicity scores
                 sentiment = sentiment_analyzer.polarity_scores(example_text)
                 toxicity = Detoxify('original').predict(example_text)
